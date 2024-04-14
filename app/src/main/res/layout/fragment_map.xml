@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".presentation.partWithMap.FragmentMap">
+
+    <com.yandex.mapkit.mapview.MapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@+id/mapView"
+        app:layout_constraintTop_toTopOf="@+id/mapView"
+        app:layout_constraintBottom_toBottomOf="@+id/mapView"
+        android:orientation="vertical">
+        <ImageButton
+            android:id="@+id/enlargeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/enlarge_map"
+            android:layout_margin="16dp"
+            android:elevation="4dp"/>
+        <ImageButton
+            android:id="@+id/reduceButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/reduce_map"
+            android:layout_margin="16dp"
+            android:elevation="4dp"/>
+        <ImageButton
+            android:id="@+id/locationButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/location_icon"
+            android:layout_margin="16dp"
+            android:elevation="4dp"/>
+    </LinearLayout>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout >

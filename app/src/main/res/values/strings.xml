@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Attractions</string>
+    <string name="latitude_string">Широта:\n%s</string>
+    <string name="longitude_string">Долгота:\n%s</string>
+</resources>
