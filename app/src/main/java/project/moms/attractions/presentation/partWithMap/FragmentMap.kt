@@ -18,7 +18,6 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.material.snackbar.Snackbar
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
@@ -100,6 +99,7 @@ class FragmentMap : Fragment() {
         binding.enlargeButton.setOnClickListener { changeZoom(5f) }
         binding.reduceButton.setOnClickListener { changeZoom(-5f) }
     }
+
     // region saveState
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -118,6 +118,7 @@ class FragmentMap : Fragment() {
         )
     }
     // endregion
+
     private fun changeZoom(delta: Float) {
         val currentZoom = mapView.map.cameraPosition.zoom
         mapView.map.move(
@@ -125,17 +126,23 @@ class FragmentMap : Fragment() {
             Animation(Animation.Type.SMOOTH, 1f), null
         )
     }
+
     private fun checkPermissions() {
             val isAllGranted = REQUEST_PERMISSIONS.all { permission ->
                 ContextCompat.checkSelfPermission(requireContext(), permission) ==
                         PackageManager.PERMISSION_GRANTED
             }
             if (isAllGranted) {
-                Toast.makeText(requireContext(), "permission is Granted", Toast.LENGTH_SHORT).show()
+                if (!viewModel.permissionToastShown) {
+                    Toast.makeText(requireContext(), "Разрешения для локации предоставлены",
+                        Toast.LENGTH_SHORT).show()
+                    viewModel.permissionToastShown = true
+                }
             } else {
                 launcher.launch(REQUEST_PERMISSIONS)
             }
         }
+
     private fun getBitmapFromVectorDrawable(context: Context, drawableId: Int): Bitmap? {
         val drawable = ContextCompat.getDrawable(context, drawableId)
         drawable?.let {
@@ -149,6 +156,7 @@ class FragmentMap : Fragment() {
         }
         return null
     }
+
     private fun showMyLocation() {
         val permissionsToRequest = REQUEST_PERMISSIONS.filter {
             ContextCompat.checkSelfPermission(requireContext(), it) !=
@@ -191,15 +199,6 @@ class FragmentMap : Fragment() {
         }
     }
 
-
-
-
-
-
-
-
-
-
     private fun addingIconsForElements(landmarks: List<Element>) {
         val bitmap = getBitmapFromVectorDrawable(requireContext(), R.drawable.marker)
         val icon = ImageProvider.fromBitmap(bitmap)
@@ -234,7 +233,6 @@ class FragmentMap : Fragment() {
     private fun setupMarkerTapListener() {
         mapObjects.addTapListener { mapObject, _ ->
             if (mapObject is PlacemarkMapObject) {
-//                Snackbar.make(requireView(), "Это маркер", Snackbar.LENGTH_SHORT).show()
                 (mapObject.userData as? Element)?.let {
                     sendMarker(it)
                 }
@@ -250,14 +248,6 @@ class FragmentMap : Fragment() {
         }
         findNavController().navigate(R.id.action_fragmentMap_to_fragmentFullScreenItem, bundle)
     }
-
-
-
-
-
-
-
-
 
     override fun onStart() {
         super.onStart()

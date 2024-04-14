@@ -14,12 +14,6 @@ class FragmentFullScreenItem : Fragment() {
     private val binding : FullScreenItemBinding
         get() {return _binding!!}
 
-    private var param: Element? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FullScreenItemBinding.inflate(inflater)
         return binding.root

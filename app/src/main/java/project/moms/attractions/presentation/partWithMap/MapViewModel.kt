@@ -16,6 +16,13 @@ class MapViewModel(
     private val apiService: LandmarksApiService
 ) : ViewModel() {
 
+    private var _permissionToastShown = false
+    var permissionToastShown: Boolean = false
+
+    init {
+        _permissionToastShown = false
+    }
+
     val landmarkData: MutableLiveData<List<Element>> by lazy {
         MutableLiveData<List<Element>>()
     }
