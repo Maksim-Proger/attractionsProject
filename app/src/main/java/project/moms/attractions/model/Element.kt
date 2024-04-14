@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Element(
-    val name: String,
+    val name: String?,
     val lat: Double,
     val lon: Double,
     val tags: Map<String, String>

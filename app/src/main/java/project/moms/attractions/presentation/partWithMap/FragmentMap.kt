@@ -31,11 +31,14 @@ import project.moms.attractions.R
 import project.moms.attractions.data.api.NetworkApi
 import project.moms.attractions.databinding.FragmentMapBinding
 import project.moms.attractions.model.Element
+import project.moms.attractions.services.NotificationService
 
+// TODO надо доработать так. чтобы запрос на получение уведомлений запрашивался только после нажатия на кнопку
 class FragmentMap : Fragment() {
     private var _binding : FragmentMapBinding? = null
     private val binding : FragmentMapBinding
         get() {return _binding!!}
+
     private val launcher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { map ->
         if (map.values.all { it }) {
             showMyLocation()
@@ -48,6 +51,7 @@ class FragmentMap : Fragment() {
     private lateinit var mapObjects: MapObjectCollection
     private lateinit var fusedClient: FusedLocationProviderClient
     private lateinit var viewModel: MapViewModel
+    private lateinit var notificationService: NotificationService
 
     private var saveLatitude = 0.0
     private var saveLongitude = 0.0
@@ -61,6 +65,8 @@ class FragmentMap : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        notificationService = NotificationService(requireContext())
 
         mapView = view.findViewById(R.id.mapView)
         mapView.map.move(
@@ -96,6 +102,9 @@ class FragmentMap : Fragment() {
         binding.locationButton.setOnClickListener {
 //            FirebaseCrashlytics.getInstance().log("Имитируем краш приложения!")
 //            throw Exception("Приложение сломалось!")
+
+            notificationService.createNotification()
+
             showMyLocation()
         }
 
@@ -270,6 +279,7 @@ class FragmentMap : Fragment() {
         private val REQUEST_PERMISSIONS: Array<String> = buildList {
             add(Manifest.permission.ACCESS_FINE_LOCATION)
             add(Manifest.permission.ACCESS_COARSE_LOCATION)
+            add(Manifest.permission.POST_NOTIFICATIONS)
         }.toTypedArray()
         private const val SAVE_LATITUDE = "latitude"
         private const val SAVE_LONGITUDE = "longitude"

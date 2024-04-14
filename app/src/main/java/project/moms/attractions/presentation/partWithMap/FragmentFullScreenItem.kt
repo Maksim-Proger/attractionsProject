@@ -32,7 +32,7 @@ class FragmentFullScreenItem : Fragment() {
             } else {
                 binding.fieldHeader.text = header
             }
-
+//            binding.fieldHeader.text = header
             binding.fieldLatitude.text = getString(R.string.latitude_string, latitude.toString())
             binding.fieldLongitude.text = getString(R.string.longitude_string, longitude.toString())
         }
