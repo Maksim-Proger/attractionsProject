@@ -18,6 +18,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
@@ -93,6 +94,8 @@ class FragmentMap : Fragment() {
         }
 
         binding.locationButton.setOnClickListener {
+//            FirebaseCrashlytics.getInstance().log("Имитируем краш приложения!")
+//            throw Exception("Приложение сломалось!")
             showMyLocation()
         }
 
@@ -229,7 +232,6 @@ class FragmentMap : Fragment() {
         placeMark.userData = element // связываем место маркера и элемент
     }
 
-    // Настраиваем слушатель нажатия на маркеры
     private fun setupMarkerTapListener() {
         mapObjects.addTapListener { mapObject, _ ->
             if (mapObject is PlacemarkMapObject) {

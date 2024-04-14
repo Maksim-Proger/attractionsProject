@@ -4,6 +4,8 @@ plugins {
     id("kotlin-kapt")
     id("kotlin-parcelize")
     id("dagger.hilt.android.plugin")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -42,6 +44,13 @@ android {
 }
 
 dependencies {
+
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
+    implementation("com.google.firebase:firebase-analytics")
+
+    // Crashlytics
+    implementation("com.google.firebase:firebase-crashlytics")
 
     //AndroidX Navigation
     implementation ("androidx.navigation:navigation-fragment-ktx:2.7.7")
