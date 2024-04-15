@@ -25,6 +25,7 @@ import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.map.MapObject
 import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.mapview.MapView
@@ -35,14 +36,11 @@ import project.moms.attractions.databinding.FragmentMapBinding
 import project.moms.attractions.model.Element
 import project.moms.attractions.services.NotificationService
 
-
-// TODO надо доработать так. чтобы запрос на получение уведомлений запрашивался только после нажатия на кнопку
 class FragmentMap : Fragment() {
     private var _binding : FragmentMapBinding? = null
     private val binding : FragmentMapBinding
         get() {return _binding!!}
 
-    // TODO убрать или переработать этот кусок
     private val launcher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { map ->
         if (map.values.all { it }) {
 //            showMyLocation()
@@ -51,9 +49,11 @@ class FragmentMap : Fragment() {
         }
     }
 
-    private lateinit var mapView: MapView
-    private lateinit var mapObjects: MapObjectCollection
-    private lateinit var fusedClient: FusedLocationProviderClient
+    private lateinit var mapView: MapView // Ссылка на компонент карты в UI
+    private lateinit var mapObjects: MapObjectCollection // Коллекция всех объектов отображаемых на карте.
+    private lateinit var fusedClient: FusedLocationProviderClient // Клиент для доступа к данным о местоположении устройства.
+    private val markerDataMap = mutableMapOf<PlacemarkMapObject, Element>() // Словарь связывающий маркеры на карте с данными.
+    private val placeMarks: MutableList<MapObject> = mutableListOf() // Список хранения всех созданных маркеров для управления ими.
 
     private val viewModel: MapViewModel by viewModels {
         MapViewModelFactory(NetworkApi.apiService)
@@ -66,7 +66,7 @@ class FragmentMap : Fragment() {
     private var saveZoom = 0.0f
     private var routeStartLocation = Point(0.0, 0.0)
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentMapBinding.inflate(inflater)
         return binding.root
     }
@@ -80,10 +80,10 @@ class FragmentMap : Fragment() {
         mapView.map.move(
             CameraPosition(
                 Point(55.755811, 37.617617),
-                11.0f,
+                15.0f,
                 0.0f,
                 0.0f
-            ), Animation(Animation.Type.SMOOTH, 3f), null
+            )
         )
         mapObjects = mapView.map.mapObjects.addCollection()
 
@@ -183,15 +183,11 @@ class FragmentMap : Fragment() {
         if (permissionsToRequest.isEmpty()) {
             fusedClient.lastLocation.addOnSuccessListener { location ->
                 location?.let {
-                    Log.d("FragmentMap", "Получено местоположение: $location")
-
+                    Log.d("My location", "Получено местоположение: $location")
                     val point = Point(it.latitude, it.longitude)
-
-                    // Записываем значения в наши константы для сохранения положения карты
                     saveLatitude = it.latitude
                     saveLongitude = it.longitude
                     saveZoom = 11.0f
-
                     mapView.map.move(
                         CameraPosition(
                             point,
@@ -200,14 +196,12 @@ class FragmentMap : Fragment() {
                             0.0f
                         ), Animation(Animation.Type.SMOOTH, 3f), null
                     )
-
                     val currentLocation = Element(
                         name = "My location",
                         lat = it.latitude,
                         lon = it.longitude,
                         tags = mapOf()
                     )
-
                     val bitmap = getBitmapFromVectorDrawable(requireContext(), R.drawable.marker)
                     val icon = ImageProvider.fromBitmap(bitmap)
                     addMarks(point, currentLocation, icon)
@@ -222,18 +216,18 @@ class FragmentMap : Fragment() {
     private fun addingIconsForElements(landmarks: List<Element>) {
         val bitmap = getBitmapFromVectorDrawable(requireContext(), R.drawable.marker)
         val icon = ImageProvider.fromBitmap(bitmap)
-
         for (landmark in landmarks) {
             checkCoordinate(landmark, icon)
         }
-
-        setupMarkerTapListener()
     }
 
     private fun checkCoordinate(element: Element, icon: ImageProvider) {
         if (isValidCoordinate(element.lat, element.lon)) {
-            val point = Point(element.lat, element.lon)
-            addMarks(point, element, icon)
+            val name = element.tags["name:en"] ?: "Unknown"
+            if (name != "Unknown") {
+                val point = Point(element.lat, element.lon)
+                addMarks(point, element, icon)
+            }
         }
     }
 
@@ -246,17 +240,15 @@ class FragmentMap : Fragment() {
     private fun addMarks(point: Point, element: Element, icon: ImageProvider) {
         val placeMark = mapObjects.addPlacemark(point)
         placeMark.setIcon(icon)
-        placeMark.userData = element // связываем место маркера и элемент
-    }
+        markerDataMap[placeMark] = element
+        placeMarks.add(placeMark)  // Сохраняем ссылку на placeMark
 
-    private fun setupMarkerTapListener() {
-        mapObjects.addTapListener { mapObject, _ ->
-            if (mapObject is PlacemarkMapObject) {
-                (mapObject.userData as? Element)?.let {
-                    sendMarker(it)
-                }
-                true
-            } else false
+        placeMark.addTapListener { mapObject, _ ->
+            Log.d("MarkerTap", "Маркер нажат: ${markerDataMap[mapObject]}")
+            markerDataMap[mapObject]?.let { element ->
+                sendMarker(element)
+            }
+            true
         }
     }
 
@@ -265,7 +257,8 @@ class FragmentMap : Fragment() {
         val bundle = Bundle().apply {
             putParcelable(FragmentFullScreenItem.KEY_MARKER, item)
         }
-        findNavController().navigate(R.id.action_fragmentMap_to_fragmentFullScreenItem, bundle)
+//        findNavController().navigate(R.id.action_fragmentMap_to_fragmentFullScreenItem, bundle)
+        findNavController().navigate(R.id.fragmentFullScreenItem, bundle)
     }
 
     override fun onStart() {
