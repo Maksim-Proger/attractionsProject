@@ -39,9 +39,10 @@ class FragmentMap : Fragment() {
     private val binding : FragmentMapBinding
         get() {return _binding!!}
 
+    // TODO убрать или переработать этот кусок
     private val launcher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { map ->
         if (map.values.all { it }) {
-            showMyLocation()
+//            showMyLocation()
         } else {
             Toast.makeText(requireContext(), "permission is not Granted", Toast.LENGTH_SHORT).show()
         }
@@ -140,20 +141,21 @@ class FragmentMap : Fragment() {
     }
 
     private fun checkPermissions() {
-            val isAllGranted = REQUEST_PERMISSIONS.all { permission ->
-                ContextCompat.checkSelfPermission(requireContext(), permission) ==
-                        PackageManager.PERMISSION_GRANTED
-            }
-            if (isAllGranted) {
-                if (!viewModel.permissionToastShown) {
-                    Toast.makeText(requireContext(), "Разрешения для локации предоставлены",
-                        Toast.LENGTH_SHORT).show()
-                    viewModel.permissionToastShown = true
-                }
-            } else {
-                launcher.launch(REQUEST_PERMISSIONS)
+        val isAllGranted = REQUEST_PERMISSIONS.all { permission ->
+            ContextCompat.checkSelfPermission(requireContext(), permission) ==
+                    PackageManager.PERMISSION_GRANTED
+        }
+        if (isAllGranted) {
+            if (!viewModel.permissionToastShown) {
+                Toast.makeText(requireContext(), "Разрешения для локации предоставлены",
+                    Toast.LENGTH_SHORT).show()
+                viewModel.permissionToastShown = true
             }
         }
+        else {
+            launcher.launch(REQUEST_PERMISSIONS)
+        }
+    }
 
     private fun getBitmapFromVectorDrawable(context: Context, drawableId: Int): Bitmap? {
         val drawable = ContextCompat.getDrawable(context, drawableId)
@@ -188,7 +190,7 @@ class FragmentMap : Fragment() {
                     mapView.map.move(
                         CameraPosition(
                             point,
-                            11.0f,
+                            17.0f,
                             0.0f,
                             0.0f
                         ), Animation(Animation.Type.SMOOTH, 3f), null
@@ -206,7 +208,8 @@ class FragmentMap : Fragment() {
                     addMarks(point, currentLocation, icon)
                 }
             }
-        } else {
+        }
+        else {
             launcher.launch(permissionsToRequest)
         }
     }
