@@ -108,9 +108,7 @@ class FragmentMap : Fragment() {
         binding.locationButton.setOnClickListener {
 //            FirebaseCrashlytics.getInstance().log("Имитируем краш приложения!")
 //            throw Exception("Приложение сломалось!")
-
             notificationService.createNotification()
-
             showMyLocation()
         }
 
@@ -185,6 +183,8 @@ class FragmentMap : Fragment() {
         if (permissionsToRequest.isEmpty()) {
             fusedClient.lastLocation.addOnSuccessListener { location ->
                 location?.let {
+                    Log.d("FragmentMap", "Получено местоположение: $location")
+
                     val point = Point(it.latitude, it.longitude)
 
                     // Записываем значения в наши константы для сохранения положения карты
