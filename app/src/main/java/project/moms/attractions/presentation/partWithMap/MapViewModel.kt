@@ -23,6 +23,8 @@ class MapViewModel(
         _permissionToastShown = false
     }
 
+
+
     val landmarkData: MutableLiveData<List<Element>> by lazy {
         MutableLiveData<List<Element>>()
     }

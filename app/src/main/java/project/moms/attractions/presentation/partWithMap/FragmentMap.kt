@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -33,6 +34,7 @@ import project.moms.attractions.databinding.FragmentMapBinding
 import project.moms.attractions.model.Element
 import project.moms.attractions.services.NotificationService
 
+
 // TODO надо доработать так. чтобы запрос на получение уведомлений запрашивался только после нажатия на кнопку
 class FragmentMap : Fragment() {
     private var _binding : FragmentMapBinding? = null
@@ -51,7 +53,12 @@ class FragmentMap : Fragment() {
     private lateinit var mapView: MapView
     private lateinit var mapObjects: MapObjectCollection
     private lateinit var fusedClient: FusedLocationProviderClient
-    private lateinit var viewModel: MapViewModel
+
+//    private lateinit var viewModel: MapViewModel
+    private val viewModel: MapViewModel by viewModels {
+        MapViewModelFactory(NetworkApi.apiService)
+    }
+
     private lateinit var notificationService: NotificationService
 
     private var saveLatitude = 0.0
@@ -82,7 +89,7 @@ class FragmentMap : Fragment() {
 
         fusedClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
-        viewModel = MapViewModel(NetworkApi.apiService)
+//        viewModel = MapViewModel(NetworkApi.apiService)
 
         viewModel.landmarkData.observe(viewLifecycleOwner, Observer { landmarks ->
             landmarks?.let {
