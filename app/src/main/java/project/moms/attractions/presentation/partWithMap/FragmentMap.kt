@@ -20,6 +20,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.messaging.FirebaseMessaging
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
@@ -54,7 +55,6 @@ class FragmentMap : Fragment() {
     private lateinit var mapObjects: MapObjectCollection
     private lateinit var fusedClient: FusedLocationProviderClient
 
-//    private lateinit var viewModel: MapViewModel
     private val viewModel: MapViewModel by viewModels {
         MapViewModelFactory(NetworkApi.apiService)
     }
@@ -88,8 +88,6 @@ class FragmentMap : Fragment() {
         mapObjects = mapView.map.mapObjects.addCollection()
 
         fusedClient = LocationServices.getFusedLocationProviderClient(requireContext())
-
-//        viewModel = MapViewModel(NetworkApi.apiService)
 
         viewModel.landmarkData.observe(viewLifecycleOwner, Observer { landmarks ->
             landmarks?.let {
